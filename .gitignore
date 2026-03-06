@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+sdist/
+wheels/
+*.pyo
+*.pyd
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Data files
+data/raw/*.csv
+data/raw/*.xlsx
+data/processed/*.csv
+data/processed/*.parquet
+data/processed/*.pkl
+
+# Model artifacts
+models/*.h5
+models/*.pkl
+models/*.json
+models/*.pt
+models/*.pth
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Distribution
+*.tar.gz
+*.zip
+
+# Logs
+*.log
+logs/
+
+# Secrets / environment
+.env
+.env.*
+!.env.example

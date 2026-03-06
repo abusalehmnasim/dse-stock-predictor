@@ -1,3 +1,187 @@
-# DSE Stock Predictor
+# DSE Stock Predictor 📈
 
-Dhaka Stock Exchange Stock Market Prediction App using Machine Learning.
+A complete **Dhaka Stock Exchange (DSE) stock market prediction** application that combines live data ingestion, ML-powered price forecasting, a REST API backend, and an interactive dashboard.
+
+---
+
+## Features
+
+- 🔴 **Live & historical DSE data** via the `bdshare` library
+- 🔧 **Automated feature engineering** – SMA, EMA, MACD, RSI, Bollinger Bands, lag features & more
+- 🤖 **Two ML models** – stacked LSTM (deep learning) and XGBoost (gradient boosting)
+- 🌐 **FastAPI backend** with CORS, Pydantic validation, and auto-generated docs
+- 📊 **Streamlit dashboard** with interactive Plotly charts, candlestick views, and real-time predictions
+- 📓 **Jupyter notebooks** for exploration, feature engineering, and model training
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Streamlit Dashboard                   │
+│              (frontend/dashboard.py)                    │
+└──────────────────────────┬──────────────────────────────┘
+                           │ HTTP
+┌──────────────────────────▼──────────────────────────────┐
+│                     FastAPI Backend                      │
+│                  (src/api/app.py)                        │
+│  GET /api/live  ·  GET /api/historical  ·  POST /predict│
+└───┬─────────────────────────────────────────────────────┘
+    │
+    ├─── src/data/fetch_data.py   ← bdshare live / historical
+    ├─── src/data/preprocess.py  ← cleaning, normalisation
+    ├─── src/utils/indicators.py ← SMA, EMA, MACD, RSI, BB…
+    │
+    ├─── src/models/lstm_model.py    ← 3-layer stacked LSTM
+    ├─── src/models/xgboost_model.py ← XGBoost regressor
+    └─── src/models/evaluate.py      ← RMSE, MAE, MAPE, R²
+```
+
+---
+
+## Project Structure
+
+```
+dse-stock-predictor/
+├── data/
+│   ├── raw/                  # Raw CSV data from DSE
+│   └── processed/            # Cleaned, feature-engineered data
+├── notebooks/
+│   ├── 01_data_exploration.ipynb
+│   ├── 02_feature_engineering.ipynb
+│   └── 03_model_training.ipynb
+├── src/
+│   ├── __init__.py
+│   ├── data/
+│   │   ├── fetch_data.py     # Live & historical data via bdshare
+│   │   └── preprocess.py     # Cleaning, scaling, feature pipeline
+│   ├── models/
+│   │   ├── lstm_model.py     # LSTM model
+│   │   ├── xgboost_model.py  # XGBoost model
+│   │   └── evaluate.py       # Metrics & visualisation
+│   ├── api/
+│   │   └── app.py            # FastAPI backend
+│   └── utils/
+│       └── indicators.py     # Technical indicators
+├── frontend/
+│   └── dashboard.py          # Streamlit dashboard
+├── models/                   # Saved trained models
+├── requirements.txt
+├── README.md
+└── .gitignore
+```
+
+---
+
+## Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/abusalehmnasim/dse-stock-predictor.git
+cd dse-stock-predictor
+
+# 2. Create & activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+```
+
+---
+
+## Usage
+
+### Fetch data
+
+```python
+from src.data.fetch_data import fetch_historical_data
+
+df = fetch_historical_data("GP", "2023-01-01", "2024-01-01")
+print(df.head())
+```
+
+### Run the notebooks
+
+```bash
+jupyter notebook notebooks/
+```
+
+### Start the API server
+
+```bash
+uvicorn src.api.app:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Launch the Streamlit dashboard
+
+```bash
+streamlit run frontend/dashboard.py
+```
+
+---
+
+## API Documentation
+
+Once the server is running, navigate to **http://localhost:8000/docs** for the
+interactive Swagger UI.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Health check |
+| GET | `/api/live` | Current live DSE trading data |
+| GET | `/api/historical/{symbol}` | Historical OHLCV + technical indicators |
+| POST | `/api/predict` | Predict future price & get BUY/SELL/HOLD signal |
+
+#### Predict request body
+
+```json
+{
+  "symbol": "GP",
+  "days_ahead": 7,
+  "model_type": "xgboost"
+}
+```
+
+#### Signal logic
+
+| Predicted change | Signal |
+|-----------------|--------|
+| > +1.5 % | **BUY** |
+| < -1.5 % | **SELL** |
+| Otherwise | **HOLD** |
+
+---
+
+## Technical Indicators
+
+`src/utils/indicators.py` adds the following features to any OHLCV DataFrame:
+
+| Indicator | Description |
+|-----------|-------------|
+| SMA_7, SMA_21 | Simple Moving Averages |
+| EMA_12, EMA_26 | Exponential Moving Averages |
+| MACD, MACD_Signal | Moving Average Convergence/Divergence |
+| RSI | Relative Strength Index (14-period) |
+| BB_Upper/Middle/Lower | Bollinger Bands (20-period, 2σ) |
+| Volume_MA | Volume Moving Average (10-period) |
+| Daily_Return | Day-over-day % change |
+| Volatility | Rolling 10-period std of returns |
+| Lag_1 … Lag_7 | Close price lag features |
+
+---
+
+## ⚠️ Disclaimer
+
+This project is for **educational and research purposes only**. The predictions
+generated by this application should **not** be used as financial advice. Stock
+prices are inherently unpredictable and past model performance does not guarantee
+future results. Always consult a qualified financial professional before making
+investment decisions.
+
+---
+
+## License
+
+MIT License © 2024 Abu Saleh Md. Nasim
